@@ -1,0 +1,41 @@
+# defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":7777"
+
+[api]
+  dashboard = true
+  insecure = true
+
+[providers]
+  [providers.file]
+    filename = "traefik.toml"
+    watch = true
+
+[http]
+  [http.routers]
+    [http.routers.usermanagement]
+      entryPoints = ["http"]
+      rule = "PathPrefix(`/seedotech.usermanagement`)"
+      service = "usermanagement"
+      
+    [http.routers.moviemanagement]
+      entryPoints = ["http"]
+      rule = "PathPrefix(`/seedotech.moviemanagement`)"
+      service = "moviemanagement"
+
+    # Adding a router for the Traefik dashboard
+    [http.routers.api]
+      rule = "PathPrefix(`/dashboard`)"
+      service = "api@internal"
+      entryPoints = ["http"]
+
+  [http.services]
+    [http.services.usermanagement.loadBalancer]
+      [[http.services.usermanagement.loadBalancer.servers]]
+        url = "http://127.0.0.1:8808"
+
+    [http.services.moviemanagement.loadBalancer]
+      [[http.services.moviemanagement.loadBalancer.servers]]
+        url = "http://127.0.0.1:8809"
